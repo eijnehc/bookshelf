@@ -13,10 +13,43 @@ const STATUS = {
   REGISTER: 'register',
 }
 
+function LoginForm({onSubmit, buttonText}) {
+  const handleSubmit = event => {
+    event.preventDefault()
+    const {username, password} = event.target.elements
+
+    return onSubmit({username: username.value, password: password.value})
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="username">Username</label>
+        <input id="username" type="text" />
+      </div>
+      <div>
+        <label htmlFor="password">Password</label>
+        <input id="password" type="password" />
+      </div>
+      <div>
+        <button type="submit">{buttonText}</button>
+      </div>
+    </form>
+  )
+}
+
 function App() {
   const [openModal, setOpenModal] = useState(STATUS.NONE)
 
   const close = () => setOpenModal(STATUS.NONE)
+
+  function handleLogin(formData) {
+    console.log('login', formData)
+  }
+
+  function handleRegister(formData) {
+    console.log('register', formData)
+  }
 
   return (
     <>
@@ -34,6 +67,7 @@ function App() {
             <button onClick={close}>Close</button>
           </div>
           <h3>Login</h3>
+          <LoginForm onSubmit={handleLogin} buttonText="Login" />
         </Dialog>
       </div>
       <div>
@@ -48,6 +82,7 @@ function App() {
             <button onClick={close}>Close</button>
           </div>
           <h3>Register</h3>
+          <LoginForm onSubmit={handleRegister} buttonText="Register" />
         </Dialog>
       </div>
     </>
