@@ -16,27 +16,30 @@ const STATUS = {
 }
 
 function DiscoverBooksScreen() {
-  const [state, setState] = React.useState({
-    status: STATUS.IDLE,
-    data: null,
-    query: '',
-    queried: false,
-  })
+  const [status, setStatus] = React.useState(STATUS.IDLE)
+  const [query, setQuery] = React.useState('')
+  const [queried, setQueried] = React.useState(false)
+  const [data, setData] = React.useState(null)
+
+  const isLoading = status === STATUS.LOADING
+  const isSuccess = status === STATUS.SUCCESS
 
   React.useEffect(() => {
-    if (!state.query) {
+    if (!queried) {
       return
     }
-    setState({status: STATUS.LOADING})
-    client(`books?query=${encodeURIComponent(state.query)}`).then(books => {
-      setState({status: STATUS.SUCCESS, data: books})
+    setStatus(STATUS.LOADING)
+    client(`books?query=${encodeURIComponent(query)}`).then(responseData => {
+      setData(responseData)
+      setStatus(STATUS.SUCCESS)
     })
-  }, [state.query])
+  }, [query, queried])
 
   function handleSearchSubmit(event) {
     event.preventDefault()
     const {search} = event.target.elements
-    setState({queried: true, query: search.value})
+    setQuery(search.value)
+    setQueried(true)
   }
 
   return (
@@ -60,20 +63,16 @@ function DiscoverBooksScreen() {
                 background: 'transparent',
               }}
             >
-              {state.status === STATUS.LOADING ? (
-                <Spinner />
-              ) : (
-                <FaSearch aria-label="search" />
-              )}
+              {isLoading ? <Spinner /> : <FaSearch aria-label="search" />}
             </button>
           </label>
         </Tooltip>
       </form>
 
-      {state.status === STATUS.SUCCESS ? (
-        state.data?.books?.length ? (
+      {isSuccess ? (
+        data?.books?.length ? (
           <BookListUL css={{marginTop: 20}}>
-            {state.data.books.map(book => (
+            {data.books.map(book => (
               <li key={book.id} aria-label={book.title}>
                 <BookRow key={book.id} book={book} />
               </li>
